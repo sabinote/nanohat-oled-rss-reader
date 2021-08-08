@@ -1,12 +1,17 @@
-use i2cdev::linux::{LinuxI2CDevice, LinuxI2CError};
-use i2cdev::core::*;
 
-pub struct NanoHatOLED{
-    dev: LinuxI2CDevice,
+use i2cdev::core::I2CDevice;
+
+pub struct NanoHatOLED<T>
+where 
+    T: I2CDevice + Sized
+{
+    i2cdev: T,
 }
-impl NanoHatOLED {
-    pub fn open() -> Result<Self, LinuxI2CError> {
-        let mut dev = LinuxI2CDevice::new("/dev/i2c-0", 0x3c)?;
+impl<T> NanoHatOLED<T>
+where 
+    T: I2CDevice + Sized 
+{
+    pub fn open(mut i2cdev:  T) -> Result<Self, T::Error> {
         let commands = [
             0xAE, //display off
             0x00, //set lower column address
@@ -36,21 +41,33 @@ impl NanoHatOLED {
             0x00,
             0xAF, //display on
         ];
-        Self::send_commands(&mut dev, &commands)?;
+        Self::send_commands(&mut i2cdev, &commands)?;
         Ok(
             Self {
-                dev,
+                i2cdev,
             }
         )
     }
-    fn send_commands(dev: &mut LinuxI2CDevice, commands: &[u8]) -> Result<(), LinuxI2CError> {
+    fn send_commands(dev: &mut T, commands: &[u8]) -> Result<(), T::Error> {
         dev.smbus_write_i2c_block_data(0x00, commands)?;
         Ok(())
     }
-    fn send_data(dev: &mut LinuxI2CDevice, data: &[u8]) -> Result<(), LinuxI2CError> {
+    fn send_data(dev: &mut T, data: &[u8]) -> Result<(), T::Error> {
         for chunk in data.chunks(32) {
             dev.smbus_write_i2c_block_data(0x40, chunk)?;
         }
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    #[cfg(target_os = "linux")]
+    fn staging_oled_open_test() {
+        use i2cdev::linux::LinuxI2CDevice;
+        let i2cdev = LinuxI2CDevice::new("/dev/i2c-0", 0x3c).unwrap();
+        assert!(NanoHatOLED::open(i2cdev).is_ok());
     }
 }
