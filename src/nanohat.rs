@@ -1,2 +1,2 @@
-pub mod oled;
 pub mod button;
+pub mod oled;
