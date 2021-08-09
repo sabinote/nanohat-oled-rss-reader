@@ -188,8 +188,12 @@ mod tests {
     fn clear() {
         let i2cdev = LinuxI2CDevice::new("/dev/i2c-0", 0x3c).unwrap();
         let mut oled = NanoHatOLED::open(i2cdev).unwrap();
-        let img_10x8 = DynamicImage::new_luma8(10, 8);
-        assert!(oled.draw_image(&img_10x8, 0, 0).is_ok());
+        
+        assert!(oled.clear(0, 0, 128, 8).is_ok());
+        assert!(oled.clear(0, 0, 129, 8).is_err());
+        assert!(oled.clear(0, 0, 128, 9).is_err());
+        assert!(oled.clear(129, 0, 1, 1).is_err());
+        assert!(oled.clear(0, 8, 1, 1).is_err());
     }
     
 }
