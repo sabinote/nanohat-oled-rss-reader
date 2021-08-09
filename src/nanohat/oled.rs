@@ -144,7 +144,7 @@ where
             /*do nothing*/
         }
         self.set_draw_range(x, y, w, h)?;
-        let data = (0..).take((x as usize * w as usize - 1) * (y as usize * h as usize -1)).map(|_| 0x00).collect::<Vec<_>>();
+        let data = (0..).take(w as usize * h as usize).map(|_| 0x00).collect::<Vec<_>>();
         Self::send_data(&mut self.i2cdev, &data)?;
         Ok(())
     }
