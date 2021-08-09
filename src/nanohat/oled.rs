@@ -96,6 +96,7 @@ where
         let height_pixel_offsets = [0, 8, 16, 24, 32, 40, 48, 56];
         let data = height_pixel_offsets
             .iter()
+            .take(h as usize)
             .map(|offset| {
                 (0..w)
                     .map(|x| {
