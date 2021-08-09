@@ -77,7 +77,7 @@ where
         } else if rem != 0 {
             return Err(io::Error::new(
                 io::ErrorKind::InvalidInput,
-                "This Image's height are invalid ",
+                "The Image's height are invalid ",
             )
             .into());
         } else if y as u32 + h > 8 {
@@ -119,25 +119,25 @@ where
         if x + w > 128 {
             return Err(io::Error::new(
                 io::ErrorKind::InvalidInput,
-                "This range is too large",
+                "The range is too large",
             )
             .into());
         } else if y + h > 8 {
             return Err(io::Error::new(
                 io::ErrorKind::InvalidInput,
-                "This range is too large",
+                "The range is too large",
             )
             .into());
-        } else if x + w == 0 {
+        } else if w == 0 {
             return Err(io::Error::new(
                 io::ErrorKind::InvalidInput,
-                "This range is too small",
+                "The width must not be zero",
             )
             .into());
-        } else if y + h == 0 {
+        } else if h == 0 {
             return Err(io::Error::new(
                 io::ErrorKind::InvalidInput,
-                "This range is too small",
+                "The height must not be zero",
             )
             .into());
         } else {
