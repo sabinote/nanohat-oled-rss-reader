@@ -119,13 +119,25 @@ where
         if x + w > 128 {
             return Err(io::Error::new(
                 io::ErrorKind::InvalidInput,
-                "The Image's dimensions are too large",
+                "This range is too large",
             )
             .into());
         } else if y + h > 8 {
             return Err(io::Error::new(
                 io::ErrorKind::InvalidInput,
-                "The Image's dimensions are too large",
+                "This range is too large",
+            )
+            .into());
+        } else if x + w == 0 {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "This range is too small",
+            )
+            .into());
+        } else if y + h == 0 {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "This range is too small",
             )
             .into());
         } else {
