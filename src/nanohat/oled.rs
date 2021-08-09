@@ -148,17 +148,17 @@ mod tests {
         assert!(oled.draw_image(&img_8x8, 0, 7).is_ok());
     }
     #[test]
-    fn draw_image_test2() {
-        let i2cdev = LinuxI2CDevice::new("/dev/i2c-0", 0x3c).unwrap();
-        let mut oled = NanoHatOLED::open(i2cdev).unwrap();
-        let img_8x9 = DynamicImage::new_luma8(8, 9);
-        assert!(oled.draw_image(&img_8x8, 0, 0).is_err());
-    }
-    #[test]
     fn draw_image_test3() {
         let i2cdev = LinuxI2CDevice::new("/dev/i2c-0", 0x3c).unwrap();
         let mut oled = NanoHatOLED::open(i2cdev).unwrap();
+        let img_8x9 = DynamicImage::new_luma8(8, 9);
+        assert!(oled.draw_image(&img_8x9, 0, 0).is_err());
+    }
+    #[test]
+    fn draw_image_test4() {
+        let i2cdev = LinuxI2CDevice::new("/dev/i2c-0", 0x3c).unwrap();
+        let mut oled = NanoHatOLED::open(i2cdev).unwrap();
         let img_10x8 = DynamicImage::new_luma8(10, 8);
-        assert!(oled.draw_image(&img_8x8, 0, 0).is_ok());
+        assert!(oled.draw_image(&img_10x8, 0, 0).is_ok());
     }
 }
