@@ -8,3 +8,6 @@ edition = "2018"
 [dependencies]
 i2cdev = "0.4.4"
 image = "0.23.14"
+futures = "0.3.16"
+tokio = { version = "0.2", features = ["full"] }
+gpio-cdev = { version ="0.4.0", features =["async-tokio"]}

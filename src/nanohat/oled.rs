@@ -61,7 +61,12 @@ where
         Ok(())
     }
 
-    pub fn draw_image(&mut self, img: &DynamicImage, x: u8, page_y: u8) -> Result<(), Box<dyn Error>> {
+    pub fn draw_image(
+        &mut self,
+        img: &DynamicImage,
+        x: u8,
+        page_y: u8,
+    ) -> Result<(), Box<dyn Error>> {
         let w = img.width();
         let (h, rem) = {
             let h = img.height();
@@ -117,34 +122,29 @@ where
 
     pub fn clear(&mut self, x: u8, y: u8, w: u8, h: u8) -> Result<(), Box<dyn Error>> {
         if x + w > 128 {
-            return Err(io::Error::new(
-                io::ErrorKind::InvalidInput,
-                "The range is too large",
-            )
-            .into());
+            return Err(
+                io::Error::new(io::ErrorKind::InvalidInput, "The range is too large").into(),
+            );
         } else if y + h > 8 {
-            return Err(io::Error::new(
-                io::ErrorKind::InvalidInput,
-                "The range is too large",
-            )
-            .into());
+            return Err(
+                io::Error::new(io::ErrorKind::InvalidInput, "The range is too large").into(),
+            );
         } else if w == 0 {
-            return Err(io::Error::new(
-                io::ErrorKind::InvalidInput,
-                "The width must not be zero",
-            )
-            .into());
+            return Err(
+                io::Error::new(io::ErrorKind::InvalidInput, "The width must not be zero").into(),
+            );
         } else if h == 0 {
-            return Err(io::Error::new(
-                io::ErrorKind::InvalidInput,
-                "The height must not be zero",
-            )
-            .into());
+            return Err(
+                io::Error::new(io::ErrorKind::InvalidInput, "The height must not be zero").into(),
+            );
         } else {
             /*do nothing*/
         }
         self.set_draw_range(x, y, w, h)?;
-        let data = (0..).take(w as usize * h as usize).map(|_| 0x00).collect::<Vec<_>>();
+        let data = (0..)
+            .take(w as usize * h as usize)
+            .map(|_| 0x00)
+            .collect::<Vec<_>>();
         Self::send_data(&mut self.i2cdev, &data)?;
         Ok(())
     }
@@ -200,12 +200,11 @@ mod tests {
     fn clear() {
         let i2cdev = LinuxI2CDevice::new("/dev/i2c-0", 0x3c).unwrap();
         let mut oled = NanoHatOLED::open(i2cdev).unwrap();
-        
+
         assert!(oled.clear(0, 0, 128, 8).is_ok());
         assert!(oled.clear(0, 0, 129, 8).is_err());
         assert!(oled.clear(0, 0, 128, 9).is_err());
         assert!(oled.clear(129, 0, 1, 1).is_err());
         assert!(oled.clear(0, 8, 1, 1).is_err());
     }
-    
 }
