@@ -55,6 +55,7 @@ impl Button {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[cfg(test)]
     fn open_test() {
         let button = Button::open("");
         assert!(Button::open("").is_err());
