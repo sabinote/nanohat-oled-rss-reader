@@ -61,7 +61,7 @@ where
         Ok(())
     }
 
-    pub fn draw_image(&mut self, img: &DynamicImage, x: u8, y: u8) -> Result<(), Box<dyn Error>> {
+    pub fn draw_image(&mut self, img: &DynamicImage, x: u8, page_y: u8) -> Result<(), Box<dyn Error>> {
         let w = img.width();
         let (h, rem) = {
             let h = img.height();
@@ -80,7 +80,7 @@ where
                 "The Image's height are invalid ",
             )
             .into());
-        } else if y as u32 + h > 8 {
+        } else if page_y as u32 + h > 8 {
             return Err(io::Error::new(
                 io::ErrorKind::InvalidInput,
                 "The Image's dimensions are too large",
