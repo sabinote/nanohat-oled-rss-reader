@@ -55,8 +55,8 @@ impl Button {
 #[cfg(test)]
 mod tests {
     use super::*;
-    #[test]
-    fn open_test() {
+    #[tokio::test]
+    async fn open_test() {
         let button = Button::open("");
         assert!(Button::open("").is_err());
         assert!(Button::open("/dev/gpiochip0").is_ok());
