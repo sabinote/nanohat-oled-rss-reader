@@ -19,8 +19,10 @@ impl FromStr for RSS {
 #[derive(Deserialize)]
 pub struct Channel {
     pub language: String,
+    pub copyright: String,
     #[serde(rename = "pubDate")]
     pub pub_date: String,
+    pub title: String,
     pub link: String,
     pub description: String,
     #[serde(rename = "item")]
