@@ -46,21 +46,22 @@ mod tests {
     fn make_rss_test() {
         let s = r#"
             <rss version="2.0">
-            <channel>
-                <language>ja</language>
-                <copyright>sabinote</copyright>
-                <pubDate>2021-08-12T12:03:56.577Z</pubDate>
-                <title>タイトルです</title>
-                <link>リンクです</link>
-                <description>説明です</description>
-                <item>
-                    <title>アイテムのタイトルです</title>
-                    <link>アイテムへのリンクです</link>
-                    <pubDate>2021-08-12T11:37:05.000Z</pubDate>
-                    <description>アイテムの説明です</description>
-                    <comments>アイテムへのコメントです</comments>
-                </item>
-            </channel>
+                <channel>
+                    <language>ja</language>
+                    <copyright>sabinote</copyright>
+                    <pubDate>2021-08-12T12:03:56.577Z</pubDate>
+                    <title>タイトルです</title>
+                    <link>リンクです</link>
+                    <description>説明です</description>
+                    <item>
+                        <title>アイテムのタイトルです</title>
+                        <link>アイテムへのリンクです</link>
+                        <pubDate>2021-08-12T11:37:05.000Z</pubDate>
+                        <description>アイテムの説明です</description>
+                        <comments>アイテムへのコメントです</comments>
+                    </item>
+                </channel>
+            </rss>
         "#;
         let rss = RSS::from_str(&s).unwrap();
         let channel = &rss.channel;
