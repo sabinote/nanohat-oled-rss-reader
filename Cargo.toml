@@ -11,3 +11,5 @@ image = "0.23.14"
 futures = "0.3.16"
 tokio = { version = "0.2", features = ["full"] }
 gpio-cdev = { version ="0.4.0", features =["async-tokio"]}
+serde = { version = "1.0", features = ["derive"] }
+serde-xml-rs = "0.5.0"
