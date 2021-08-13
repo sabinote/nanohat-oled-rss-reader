@@ -27,6 +27,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let mut img = GrayImage::new(128, 64);
     draw_text_mut(&mut img, Luma([255]), 0, 0, Scale{x:8.0, y:8.0}, &font, rss.channel.title);
-    oled.draw_image(DynamicImage::ImageLuma8(img), 0, 0)?;
+    oled.draw_image(&DynamicImage::ImageLuma8(img), 0, 0)?;
     Ok(())
 }
