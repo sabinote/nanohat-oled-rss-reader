@@ -11,7 +11,7 @@ pub struct RSS {
 impl FromStr for RSS {
     type Err = Error;
     
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+    pub fn from_str(s: &str) -> Result<Self, Self::Err> {
         serde_xml_rs::from_str(s)
     }
 }
