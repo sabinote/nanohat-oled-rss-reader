@@ -8,10 +8,8 @@ pub struct RSS {
     pub channel: Channel,
 }
 
-impl FromStr for RSS {
-    type Err = Error;
-    
-    pub fn from_str(s: &str) -> Result<Self, Self::Err> {
+impl RSS {
+    pub fn new(s: &str) -> Result<Self, Error> {
         serde_xml_rs::from_str(s)
     }
 }
@@ -31,12 +29,12 @@ pub struct Channel {
 
 #[derive(Deserialize)]
 pub struct Item {
-    pub title: String,
+    pub title: String,ｗ
     pub link: String,
     #[serde(rename = "pubDate")]
     pub pub_date: String,
     pub description: String,
-    pub comments: String,
+    pub comments: Option<String>,
 }
 
 #[cfg(test)]
@@ -63,7 +61,7 @@ mod tests {
                 </channel>
             </rss>
         "#;
-        let rss = RSS::from_str(&s).unwrap();
+        let rss = RSS::new(&s).unwrap();
         let channel = &rss.channel;
         assert_eq!(channel.language, "ja");
         assert_eq!(channel.copyright, "sabinote");
@@ -79,6 +77,6 @@ mod tests {
         assert_eq!(item.link, "アイテムへのリンクです");
         assert_eq!(item.pub_date, "2021-08-12T11:37:05.000Z");
         assert_eq!(item.description, "アイテムの説明です");
-        assert_eq!(item.comments, "アイテムへのコメントです");
+        assert_eq!(item.comments.unwrap(), "アイテムへのコメントです");
     }
 }
