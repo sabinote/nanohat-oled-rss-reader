@@ -1,5 +1,4 @@
 use serde::Deserialize;
-use std::str::FromStr;
 use serde_xml_rs::Error;
 
 #[derive(Deserialize)]
