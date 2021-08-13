@@ -18,15 +18,15 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .text()
         .await?;
     let rss = rss::RSS::new(&xml)?;
-    let items = rss.channel.items;
+    let items = &rss.channel.items;
     
     let font = {
-        let v =  Vec::from(include_bytes!("./font/misaki_gothic.ttf") as &[u8]);
+        let v =  Vec::from(include_bytes!("./src/font/misaki_gothic.ttf") as &[u8]);
         Font::try_from_vec(v).unwrap()
     };
 
     let mut img = GrayImage::new(128, 64);
-    draw_text_mut(&mut img, Luma([255]), 0, 0, Scale{x:8.0, y:8.0}, font, rss.channel.title);
+    draw_text_mut(&mut img, Luma([255]), 0, 0, Scale{x:8.0, y:8.0}, &font, rss.channel.title);
     oled.draw_image(DynamicImage::ImageLuma8(img), 0, 0)?;
     Ok(())
 }
