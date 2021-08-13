@@ -108,7 +108,7 @@ where
                         (0..8).rev().fold(0u8, |mut bits, y| {
                             let px = gray_img.get_pixel(x as u32, offset + y);
                             bits <<= 1;
-                            bits |= if px[0] == 255 { 0 } else { 1 };
+                            bits |= if px[0] == 255 { 1 } else { 0 };
                             bits
                         })
                     })
