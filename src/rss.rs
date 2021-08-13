@@ -29,7 +29,7 @@ pub struct Channel {
 
 #[derive(Deserialize)]
 pub struct Item {
-    pub title: String,ｗ
+    pub title: String,
     pub link: String,
     #[serde(rename = "pubDate")]
     pub pub_date: String,
