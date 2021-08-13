@@ -24,9 +24,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
         let v =  Vec::from(include_bytes!("font/misaki_gothic.ttf") as &[u8]);
         Font::try_from_vec(v).unwrap()
     };
-
     let mut img = GrayImage::new(128, 64);
-    draw_text_mut(&mut img, Luma([255]), 0, 0, Scale{x:8.0, y:8.0}, &font, &rss.channel.title);
+    for (i, item) in items.into_iter().enumerate() {
+        draw_text_mut(&mut img, Luma([255]), 0, i * 8, Scale{x:8.0, y:8.0}, &font, &item.title);
+    }
     oled.draw_image(&DynamicImage::ImageLuma8(img), 0, 0)?;
     Ok(())
 }
