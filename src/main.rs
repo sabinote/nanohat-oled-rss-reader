@@ -84,6 +84,25 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             oled.set_draw_range(0, category_pane.selected as u8, 128, 8)?;
                             oled.draw_image(&DynamicImage::ImageLuma8(img), 0, category_pane.selected as u8)?;
                         }
+                        else {
+                            let mut img = GrayImage::new(128, 64);
+                            let start = category_pane.display_range.start + 1;
+                            let end = category_pane.display_range.end + 1;
+                            category_pane.display_range = start..end;
+                            let i = 7;
+                            category_pane.selected = 7;
+                            for (i, (s, _)) in category_pane.categories[start..end].iter().enumerate() {
+                                if category_pane.selected == i {
+                                    let mut sub = img.sub_image(0, (i * 8) as u32, 128, 8);
+                                    invert(&mut sub);
+                                    draw_text_mut(&mut img, Luma([0]), 0, (i * 8) as u32, Scale{x:8.0, y:8.0}, &font, s);
+                                }
+                                else {
+                                    draw_text_mut(&mut img, Luma([255]), 0, (i * 8) as u32, Scale{x:8.0, y:8.0}, &font, s);
+                                }
+                            }
+
+                        }
                     },
                     [false, false, true] => {
                         if category_pane.selected > 0 {
