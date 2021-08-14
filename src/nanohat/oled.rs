@@ -116,7 +116,7 @@ where
             })
             .flat_map(|v| v)
             .collect::<Vec<_>>();
-        self.set_draw_range(x, page_y, w, h)?;
+        self.set_draw_range(x, page_y, w as u8, h as u8)?;
         Self::send_data(&mut self.i2cdev, &data)?;
         Ok(())
     }
