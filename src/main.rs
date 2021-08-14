@@ -11,7 +11,7 @@ use i2cdev::linux::LinuxI2CDevice;
 
 
 struct CategoryPane {
-    categories: Vec<(&str), &str)>,
+    categories: Vec<(&str, &str)>,
     display_range: Range<usize>,
     selected: usize,
 }
