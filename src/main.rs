@@ -12,7 +12,7 @@ use i2cdev::linux::LinuxI2CDevice;
 
 struct CategoryPane {
     categories: Vec<(String, String)>,
-    display_range: Range,
+    display_range: Range<usize>,
     selected: usize,
 }
 
@@ -54,7 +54,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     for (i, (s, _)) in category_pane.categories[display_range].enumerate() {
         if category_pane.selected == i {
             let mut sub = img.sub_image(0, (i * 8) as u32, 128, 8);
-            invert(&mut sub)
+            invert(&mut sub);
             draw_text_mut(&mut img, Luma([0]), 0, (i * 8) as u32, Scale{x:8.0, y:8.0}, &font, s);
         }
         else {
