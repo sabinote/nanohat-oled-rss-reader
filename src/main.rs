@@ -39,8 +39,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
             ("国内".to_string(),"https://news.yahoo.co.jp/rss/topics/domestic.xml".to_string()),
             ("国際".to_string(),"https://news.yahoo.co.jp/rss/topics/world.xml".to_string()),
             ("経済".to_string(),"https://news.yahoo.co.jp/rss/topics/business.xml".to_string()),
-            ("エンタメ.to_string()","https://news.yahoo.co.jp/rss/topics/entertainment.xml".to_string()),
-            ("スポーツ.to_string()","https://news.yahoo.co.jp/rss/topics/sports.xml".to_string()),
+            ("エンタメ".to_string(),"https://news.yahoo.co.jp/rss/topics/entertainment.xml".to_string()),
+            ("スポーツ".to_string(),"https://news.yahoo.co.jp/rss/topics/sports.xml".to_string()),
             ("IT".to_string(),"https://news.yahoo.co.jp/rss/topics/it.xml".to_string()),
             ("科学".to_string(),"https://news.yahoo.co.jp/rss/topics/science.xml".to_string()),
             ("地域".to_string(),"https://news.yahoo.co.jp/rss/topics/local.xml".to_string()),
@@ -51,7 +51,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let mut state = State::Categories;
 
     let mut img = GrayImage::new(128, 64);
-    for (i, (s, _)) in category_pane.categories[display_range].enumerate() {
+    for (i, (s, _)) in category_pane.categories[category_pane.display_range].enumerate() {
         if category_pane.selected == i {
             let mut sub = img.sub_image(0, (i * 8) as u32, 128, 8);
             invert(&mut sub);
