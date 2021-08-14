@@ -185,6 +185,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                                 }
                             }
                             oled.draw_image(&DynamicImage::ImageLuma8(img), 0, 0)?;
+                            
                         } else {
                         }
                     }
@@ -211,6 +212,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             invert(&mut img);
                             category_pane.selected -= 1;
                             let i = category_pane.display_range.start + category_pane.selected;
+
                             draw_text_mut(
                                 &mut img,
                                 Luma([0]),
@@ -229,6 +231,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             let mut img = GrayImage::new(128, 64);
                             let start = category_pane.display_range.start - 1;
                             let end = category_pane.display_range.end - 1;
+                            category_pane.display_range = start..end;
                             let i = 0;
                             category_pane.selected = 0;
                             for (i, (s, _)) in
