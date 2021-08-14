@@ -51,7 +51,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let mut state = State::Categories;
 
     let mut img = GrayImage::new(128, 64);
-    for (i, (s, _)) in category_pane.categories[category_pane.display_range.start, category_pane.display_range.end].iter().enumerate() {
+    for (i, (s, _)) in category_pane.categories[category_pane.display_range.start..category_pane.display_range.end].iter().enumerate() {
         if category_pane.selected == i {
             let mut sub = img.sub_image(0, (i * 8) as u32, 128, 8);
             invert(&mut sub);
