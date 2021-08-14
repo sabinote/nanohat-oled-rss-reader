@@ -381,7 +381,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             let i = 7;
                             title_pane.selected = 7;
                             for (i, item) in title_pane.items[start..end].iter().enumerate() {
-                                if title_pan_pane.selected == i {
+                                if title_pane.selected == i {
                                     let mut sub = img.sub_image(0, (i * 8) as u32, 128, 8);
                                     invert(&mut sub);
                                     draw_text_mut(
