@@ -15,6 +15,12 @@ struct CategoryPane {
     selected: usize,
 }
 
+struct TitlePane {
+    items: Vec<rss::Item>,
+    display_range: Range<usize>,
+    selected: usize,
+}
+
 enum State {
     Categories,
     Titles,
@@ -73,6 +79,13 @@ async fn main() -> Result<(), Box<dyn Error>> {
         display_range: 0..8,
         selected: 0,
     };
+
+    let mut title_pane = TitlePane {
+        items: Vec::new(),
+        display_range: 0..1,
+        selected: 0,
+    };
+
     let mut state = State::Categories;
 
     let mut img = GrayImage::new(128, 64);
@@ -263,10 +276,67 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             }
                             oled.draw_image(&DynamicImage::ImageLuma8(img), 0, 0)?;
                         }
-                    }
+                    },
+                    [false, true, false] => {
+                        let i = category_pane.display_range.start + category_pane.selected;
+                        let url = &category_pane.categories[i];
+                        let s = reqwest::get(url)
+                            .await?
+                            .text()
+                            .await?;
+                        let rss = rss::RSS::new(&s)?;
+
+                        let end = {
+                            let len = rss.channel.items.len();
+                            if len > 8 {
+                                8
+                            }
+                            else {
+                                len
+                            }
+                        };
+                        title_pane = TitlePane {
+                            items: rss.channel.items,
+                            display_range: 0..end,
+                            selected: 0,
+                        }
+                        
+                        let mut img = GrayImage::new(128, 64);
+                        for (i, (item, _)) in title_pane.items
+                            [title_pane.display_range.start..title_pane.display_range.end]
+                            .iter()
+                            .enumerate()
+                        {
+                            if title_pane.selected == i {
+                                let mut sub = img.sub_image(0, (i * 8) as u32, 128, 8);
+                                invert(&mut sub);
+                                draw_text_mut(
+                                    &mut img,
+                                    Luma([0]),
+                                    0,
+                                    (i * 8) as u32,
+                                    Scale { x: 8.0, y: 8.0 },
+                                    &font,
+                                    &item.title,
+                                );
+                            } else {
+                                draw_text_mut(
+                                    &mut img,
+                                    Luma([255]),
+                                    0,
+                                    (i * 8) as u32,
+                                    Scale { x: 8.0, y: 8.0 },
+                                    &font,
+                                    &item.title,
+                                );
+                            }
+                        }
+                        oled.draw_image(&DynamicImage::ImageLuma8(img), 0, 0)?;
+
+                    },
                     _ => (),
                 }
-            }
+            },
             _ => unimplemented!(),
         }
     }
