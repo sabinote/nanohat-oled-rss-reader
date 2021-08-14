@@ -11,7 +11,7 @@ use i2cdev::linux::LinuxI2CDevice;
 
 
 struct CategoryPane {
-    categories: Vec<(&str, &str)>,
+    categories: Vec<(String, String)>,
     display_range: Range<usize>,
     selected: usize,
 }
@@ -35,15 +35,15 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let mut category_pane = CategoryPane {
         categories: vec![
-            ("主要","https://news.yahoo.co.jp/rss/topics/top-picks.xml"),
-            ("国内","https://news.yahoo.co.jp/rss/topics/domestic.xml"),
-            ("国際","https://news.yahoo.co.jp/rss/topics/world.xml"),
-            ("経済","https://news.yahoo.co.jp/rss/topics/business.xml"),
-            ("エンタメ","https://news.yahoo.co.jp/rss/topics/entertainment.xml"),
-            ("スポーツ","https://news.yahoo.co.jp/rss/topics/sports.xml"),
-            ("IT","https://news.yahoo.co.jp/rss/topics/it.xml"),
-            ("科学","https://news.yahoo.co.jp/rss/topics/science.xml"),
-            ("地域","https://news.yahoo.co.jp/rss/topics/local.xml"),
+            ("主要".to_string(),"https://news.yahoo.co.jp/rss/topics/top-picks.xml".to_string()),
+            ("国内".to_string(),"https://news.yahoo.co.jp/rss/topics/domestic.xml".to_string()),
+            ("国際".to_string(),"https://news.yahoo.co.jp/rss/topics/world.xml".to_string()),
+            ("経済".to_string(),"https://news.yahoo.co.jp/rss/topics/business.xml".to_string()),
+            ("エンタメ.to_string()","https://news.yahoo.co.jp/rss/topics/entertainment.xml".to_string()),
+            ("スポーツ.to_string()","https://news.yahoo.co.jp/rss/topics/sports.xml".to_string()),
+            ("IT".to_string(),"https://news.yahoo.co.jp/rss/topics/it.xml".to_string()),
+            ("科学".to_string(),"https://news.yahoo.co.jp/rss/topics/science.xml".to_string()),
+            ("地域".to_string(),"https://news.yahoo.co.jp/rss/topics/local.xml".to_string()),
         ],
         display_range: 0..8,
         selected: 0,
