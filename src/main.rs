@@ -68,7 +68,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         match state {
             State::Categories => {
                 match pressed {
-                    [true, _, _] => {
+                    [true, false, false] => {
                         if category_pane.selected < 7 {
                             let mut img = GrayImage::new(128, 8);
                             let i = category_pane.display_range.start + category_pane.selected;
@@ -81,6 +81,24 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             category_pane.selected += 1;
                             let i = category_pane.display_range.start + category_pane.selected;
                             draw_text_mut(&mut img, Luma([0]), 0, 0, Scale{x:8.0, y:8.0}, &font, &category_pane.categories[i].0);
+                            oled.set_draw_range(0, category_pane.selected as u8, 128, 8)?;
+                            oled.draw_image(&DynamicImage::ImageLuma8(img), 0, category_pane.selected as u8)?;
+                        }
+                    },
+                    [false, false, true] => {
+                        if category_pane.selected > 0 {
+                            let mut img = GrayImage::new(128, 8);
+                            let i = category_pane.display_range.start + category_pane.selected;
+                            draw_text_mut(&mut img, Luma([255]), 0, 0, Scale{x:8.0, y:8.0}, &font, &category_pane.categories[i].0);
+                            oled.set_draw_range(0, category_pane.selected as u8, 128, 8)?;
+                            oled.draw_image(&DynamicImage::ImageLuma8(img), 0, category_pane.selected as u8)?;
+
+                            let mut img = GrayImage::new(128, 8);
+                            invert(&mut img);
+                            category_pane.selected -= 1;
+                            let i = category_pane.display_range.start + category_pane.selected;
+                            draw_text_mut(&mut img, Luma([0]), 0, 0, Scale{x:8.0, y:8.0}, &font, &category_pane.categories[i].0);
+                            oled.set_draw_range(0, category_pane.selected as u8, 128, 8)?;
                             oled.draw_image(&DynamicImage::ImageLuma8(img), 0, category_pane.selected as u8)?;
                         }
                     },
