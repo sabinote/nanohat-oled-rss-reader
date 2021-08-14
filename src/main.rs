@@ -51,7 +51,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let mut state = State::Categories;
 
     let mut img = GrayImage::new(128, 64);
-    for (i, (s, _)) in category_pane.categories[category_pane.display_range].enumerate() {
+    for (i, (s, _)) in category_pane.categories[category_pane.display_range].iter().enumerate() {
         if category_pane.selected == i {
             let mut sub = img.sub_image(0, (i * 8) as u32, 128, 8);
             invert(&mut sub);
@@ -62,5 +62,33 @@ async fn main() -> Result<(), Box<dyn Error>> {
         }
     }
     oled.draw_image(&DynamicImage::ImageLuma8(img), 0, 0)?;
+
+
+    while let Ok(pressed) = button.pressed().await {
+        match state {
+            State::Categories => {
+                match pressed {
+                    [true, _, _] => {
+                        if category_pane.selected < 7 {
+                            let mut img = GrayImage::new(128, 8);
+                            let i = category_pane.display_range.nth(category_pane.selected).unwrap();
+                            draw_text_mut(&mut img, Luma([255]), 0, 0 Scale{x:8.0, y:8.0}, &font, &category_pane.categories[i]);
+                            oled.draw_image(&img, 0, category_pane.selected as u8);
+
+                            let mut img = GrayImage::new(128, 8);
+                            category_pane.selected += 1;
+                            let i = category_pane.display_range.nth(category_pane.selected).unwrap();
+                            draw_text_mut(&mut img, Luma([0]), 0, 0 Scale{x:8.0, y:8.0}, &font, &category_pane.categories[i]);
+                            oled.draw_image(&img, 0, category_pane.selected as u8);
+                        }
+                    },
+                    _ => {
+                        ()
+                    }
+                }
+            },
+            _ => unimplemented!(),
+        }
+    }
     Ok(())
 }
