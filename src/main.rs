@@ -279,7 +279,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                     },
                     [false, true, false] => {
                         let i = category_pane.display_range.start + category_pane.selected;
-                        let url = &category_pane.categories[i];
+                        let url = &category_pane.categories[i].1;
                         let s = reqwest::get(url)
                             .await?
                             .text()
@@ -299,10 +299,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             items: rss.channel.items,
                             display_range: 0..end,
                             selected: 0,
-                        }
+                        };
                         
                         let mut img = GrayImage::new(128, 64);
-                        for (i, (item, _)) in title_pane.items
+                        for (i, item) in title_pane.items
                             [title_pane.display_range.start..title_pane.display_range.end]
                             .iter()
                             .enumerate()
@@ -331,8 +331,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
                                 );
                             }
                         }
+                        state = State::Titles;
                         oled.draw_image(&DynamicImage::ImageLuma8(img), 0, 0)?;
-
                     },
                     _ => (),
                 }
