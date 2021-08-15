@@ -408,7 +408,80 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             oled.draw_image(&DynamicImage::ImageLuma8(img), 0, 0)?;
                         } else {
                         }
-                    },
+                    }
+                    [false, false, true] => {
+                        if title_pane.selected > 0 {
+                            let mut img = GrayImage::new(128, 8);
+                            let i = title_pane.display_range.start + title_pane.selected;
+                            draw_text_mut(
+                                &mut img,
+                                Luma([255]),
+                                0,
+                                0,
+                                Scale { x: 8.0, y: 8.0 },
+                                &font,
+                                &title_pane.items[i].title,
+                            );
+                            oled.draw_image(
+                                &DynamicImage::ImageLuma8(img),
+                                0,
+                                title_pane.selected as u8,
+                            )?;
+
+                            let mut img = GrayImage::new(128, 8);
+                            invert(&mut img);
+                            title_pane.selected -= 1;
+                            let i = title_pane.display_range.start + title_pane.selected;
+
+                            draw_text_mut(
+                                &mut img,
+                                Luma([0]),
+                                0,
+                                0,
+                                Scale { x: 8.0, y: 8.0 },
+                                &font,
+                                &title_pane.items[i].title,
+                            );
+                            oled.draw_image(
+                                &DynamicImage::ImageLuma8(img),
+                                0,
+                                title_pane.selected as u8,
+                            )?;
+                        } else if title_pane.display_range.start > 0 {
+                            let mut img = GrayImage::new(128, 64);
+                            let start = title_pane.display_range.start - 1;
+                            let end = title_pane.display_range.end - 1;
+                            title_pane.display_range = start..end;
+                            let i = 0;
+                            title_pane.selected = 0;
+                            for (i, item) in title_pane.items[start..end].iter().enumerate() {
+                                if title_pane.selected == i {
+                                    let mut sub = img.sub_image(0, (i * 8) as u32, 128, 8);
+                                    invert(&mut sub);
+                                    draw_text_mut(
+                                        &mut img,
+                                        Luma([0]),
+                                        0,
+                                        (i * 8) as u32,
+                                        Scale { x: 8.0, y: 8.0 },
+                                        &font,
+                                        &item.title,
+                                    );
+                                } else {
+                                    draw_text_mut(
+                                        &mut img,
+                                        Luma([255]),
+                                        0,
+                                        (i * 8) as u32,
+                                        Scale { x: 8.0, y: 8.0 },
+                                        &font,
+                                        &item.title,
+                                    );
+                                }
+                            }
+                            oled.draw_image(&DynamicImage::ImageLuma8(img), 0, 0)?;
+                        }
+                    }
                     _ => (),
                 }
             }
