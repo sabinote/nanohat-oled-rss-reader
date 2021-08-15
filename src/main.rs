@@ -514,6 +514,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             }
                         }
                         oled.draw_image(&DynamicImage::ImageLuma8(img), 0, 0)?;
+                        state = State::Categories;
                     }
                     _ => (),
                 }
