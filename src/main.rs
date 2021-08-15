@@ -482,7 +482,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             oled.draw_image(&DynamicImage::ImageLuma8(img), 0, 0)?;
                         }
                     }
-                    [true, true, false] => {
+                    [true, false, true] => {
                         let mut img = GrayImage::new(128, 64);
                         for (i, (s, _)) in category_pane.categories
                             [category_pane.display_range.start..category_pane.display_range.end]
