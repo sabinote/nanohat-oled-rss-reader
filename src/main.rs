@@ -482,6 +482,39 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             oled.draw_image(&DynamicImage::ImageLuma8(img), 0, 0)?;
                         }
                     }
+                    [true, true, false] => {
+                        let mut img = GrayImage::new(128, 64);
+                        for (i, (s, _)) in category_pane.categories
+                            [category_pane.display_range.start..category_pane.display_range.end]
+                            .iter()
+                            .enumerate()
+                        {
+                            if category_pane.selected == i {
+                                let mut sub = img.sub_image(0, (i * 8) as u32, 128, 8);
+                                invert(&mut sub);
+                                draw_text_mut(
+                                    &mut img,
+                                    Luma([0]),
+                                    0,
+                                    (i * 8) as u32,
+                                    Scale { x: 8.0, y: 8.0 },
+                                    &font,
+                                    s,
+                                );
+                            } else {
+                                draw_text_mut(
+                                    &mut img,
+                                    Luma([255]),
+                                    0,
+                                    (i * 8) as u32,
+                                    Scale { x: 8.0, y: 8.0 },
+                                    &font,
+                                    s,
+                                );
+                            }
+                        }
+                        oled.draw_image(&DynamicImage::ImageLuma8(img), 0, 0)?;
+                    }
                     _ => (),
                 }
             }
