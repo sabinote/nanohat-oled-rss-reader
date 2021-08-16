@@ -526,7 +526,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             let width = if c.is_ascii() { 4 } else { 8 };
                             if column_count + width > 128 {
                                 v.push(i);
-                                column_count = column_count + width - 128;
+                                column_count = width;
+                                
                             } else {
                                 column_count += width;
                             }
