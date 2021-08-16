@@ -556,7 +556,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                                 s,
                             );
                         }
-                        oled.draw_image(&img, 0, 0)?;
+                        oled.draw_image(&DynamicImage::ImageLuma8(img), 0, 0)?;
                     }
                     _ => (),
                 }
