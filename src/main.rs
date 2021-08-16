@@ -550,10 +550,48 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             );
                         }
                         oled.draw_image(&DynamicImage::ImageLuma8(img), 0, 0)?;
+                        state = State::Details;
                     }
                     _ => (),
                 }
             }
+            State::Titles => match pressed {
+                [true, false, true] => {
+                    let mut img = GrayImage::new(128, 64);
+                    for (i, item) in title_pane.items
+                        [title_pane.display_range.start..title_pane.display_range.end]
+                        .iter()
+                        .enumerate()
+                    {
+                        if title_pane.selected == i {
+                            let mut sub = img.sub_image(0, (i * 8) as u32, 128, 8);
+                            invert(&mut sub);
+                            draw_text_mut(
+                                &mut img,
+                                Luma([0]),
+                                0,
+                                (i * 8) as u32,
+                                Scale { x: 8.0, y: 8.0 },
+                                &font,
+                                &item.title,
+                            );
+                        } else {
+                            draw_text_mut(
+                                &mut img,
+                                Luma([255]),
+                                0,
+                                (i * 8) as u32,
+                                Scale { x: 8.0, y: 8.0 },
+                                &font,
+                                &item.title,
+                            );
+                        }
+                    }
+                    state = State::Titles;
+                    oled.draw_image(&DynamicImage::ImageLuma8(img), 0, 0)?;
+                }
+                _ => (),
+            },
             _ => unimplemented!(),
         }
     }
