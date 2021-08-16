@@ -516,6 +516,48 @@ async fn main() -> Result<(), Box<dyn Error>> {
                         oled.draw_image(&DynamicImage::ImageLuma8(img), 0, 0)?;
                         state = State::Categories;
                     }
+                    [false, true, false] => {
+                        let i = title_pane.display_range.start + title_pane.selected;
+                        let s = &title_pane.items[i].description;
+                        let mut column_count = 0;
+                        let mut v = Vec::new();
+
+                        for (i, c) in s.chars().enumerate() {
+                            let width = if c.is_ascii() { 4 } else { 8 };
+                            if column_count + width > 128 {
+                                v.push(i);
+                                column_count = column_count + width - 128;
+                            } else {
+                                column_count += width;
+                            }
+                        }
+                        s.chars().enumerate().for_each(|(i, c)| {
+                            let width = if c.is_ascii() { 4 } else { 8 };
+                            if column_count + width > 128 {
+                                v.push(i);
+                                column_count = column_count + width - 128;
+                            } else {
+                                column_count += width;
+                            }
+                        });
+                        let (v, _) = v.into_iter().fold((Vec::new(), 0), |(mut v, start), end| {
+                            v.push(s[start..end]);
+                            (v, end)
+                        });
+                        let mut img = GrayImage::new(128, 64);
+                        for (i, s) in v.into_iter().enumerate() {
+                            draw_text_mut(
+                                &mut img,
+                                Luma([255]),
+                                0,
+                                (i * 8) as u32,
+                                Scale { x: 8.0, y: 8.0 },
+                                &font,
+                                s,
+                            );
+                        }
+                        oled.draw_image(img, 0, 0)?;
+                    }
                     _ => (),
                 }
             }
