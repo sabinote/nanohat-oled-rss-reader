@@ -555,7 +555,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                     _ => (),
                 }
             }
-            State::Titles => match pressed {
+            State::Details => match pressed {
                 [true, false, true] => {
                     let mut img = GrayImage::new(128, 64);
                     for (i, item) in title_pane.items
