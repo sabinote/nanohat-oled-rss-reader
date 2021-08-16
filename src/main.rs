@@ -541,7 +541,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             }
                         });
                         let (v, _) = v.into_iter().fold((Vec::new(), 0), |(mut v, start), end| {
-                            v.push(s[start..end]);
+                            v.push(&s[start..end]);
                             (v, end)
                         });
                         let mut img = GrayImage::new(128, 64);
@@ -556,7 +556,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                                 s,
                             );
                         }
-                        oled.draw_image(img, 0, 0)?;
+                        oled.draw_image(&img, 0, 0)?;
                     }
                     _ => (),
                 }
