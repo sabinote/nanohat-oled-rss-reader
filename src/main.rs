@@ -520,9 +520,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                         let i = title_pane.display_range.start + title_pane.selected;
                         let s = &title_pane.items[i].description;
 
-                        let mut v = Vec::new();
-
-                        let (v, _) = s.chars().fold(
+                        let (mut v, s, _) = s.chars().fold(
                             (Vec::new(), String::new(), 0),
                             |(mut v, mut s, mut column_count), c| {
                                 let width = if c.is_ascii() { 4 } else { 8 };
@@ -538,7 +536,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                                 (v, s, column_count)
                             },
                         );
-
+                        v.push(s);
                         let mut img = GrayImage::new(128, 64);
                         for (i, s) in v.into_iter().enumerate() {
                             draw_text_mut(
@@ -548,7 +546,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                                 (i * 8) as u32,
                                 Scale { x: 8.0, y: 8.0 },
                                 &font,
-                                s,
+                                &s,
                             );
                         }
                         oled.draw_image(&DynamicImage::ImageLuma8(img), 0, 0)?;
