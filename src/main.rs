@@ -519,32 +519,26 @@ async fn main() -> Result<(), Box<dyn Error>> {
                     [false, true, false] => {
                         let i = title_pane.display_range.start + title_pane.selected;
                         let s = &title_pane.items[i].description;
-                        let mut column_count = 0;
+
                         let mut v = Vec::new();
 
-                        for (i, c) in s.chars().enumerate() {
-                            let width = if c.is_ascii() { 4 } else { 8 };
-                            if column_count + width > 128 {
-                                v.push(i);
-                                column_count = width;
-                                
-                            } else {
-                                column_count += width;
-                            }
-                        }
-                        s.chars().enumerate().for_each(|(i, c)| {
-                            let width = if c.is_ascii() { 4 } else { 8 };
-                            if column_count + width > 128 {
-                                v.push(i);
-                                column_count = column_count + width - 128;
-                            } else {
-                                column_count += width;
-                            }
-                        });
-                        let (v, _) = v.into_iter().fold((Vec::new(), 0), |(mut v, start), end| {
-                            v.push(&s[start..end]);
-                            (v, end)
-                        });
+                        let (v, _) = s.chars().fold(
+                            (Vec::new(), String::new(), 0),
+                            |(mut v, mut s, mut column_count), c| {
+                                let width = if c.is_ascii() { 4 } else { 8 };
+                                if column_count + width > 128 {
+                                    v.push(s);
+                                    s = String::new();
+                                    s.push(c);
+                                    column_count = width;
+                                } else {
+                                    s.push(c);
+                                    column_count += width;
+                                }
+                                (v, s, column_count)
+                            },
+                        );
+
                         let mut img = GrayImage::new(128, 64);
                         for (i, s) in v.into_iter().enumerate() {
                             draw_text_mut(
