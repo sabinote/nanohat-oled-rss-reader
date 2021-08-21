@@ -19,7 +19,7 @@ struct CategoryPane {
 
 struct TitlePane {
     titles: Vec<GrayImage>,
-    details: Vec<String>,
+    descriptions: Vec<String>,
     start_i: usize,
     selected: usize,
 }
@@ -81,14 +81,16 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let img = categories
         .iter()
-        .tale(8)
+        .take(8)
         .map(|(img, _)| img)
         .enumerate()
         .fold(GrayImage::new(128, 64), |mut img, (i, page)| {
             if i == 0 {
-                overlay(&mut img, &invert(&mut page.clone()), 0, i * 8);
+                let mut inverted = page.clone();
+                invert(&mut inverted);
+                overlay(&mut img, &inverted, 0, (i * 8) as u32);
             } else {
-                overlay(&mut img, page, 0, i * 8);
+                overlay(&mut img, page, 0, (i * 8) as u32);
             }
             img
         });
@@ -103,7 +105,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let mut title_pane = TitlePane {
         titles: Vec::new(),
-        details: Vec::new(),
+        descriptions: Vec::new(),
         start_i: 0,
         selected: 0,
     };
@@ -120,9 +122,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
                         oled.draw_image(img, 0, category_pane.selected as u8)?;
                         category_pane.selected += 1;
                         i += 1;
-                        let img = category_pane.categories.get(i).unwrap();
-                        let inverted = invert(&mut img.clone());
-                        oled.draw_image(&inverted, 0, category_pane.selected as u8)?;
+                        let mut img = category_pane.categories.get(i).unwrap().clone();
+                        invert(&mut img);
+                        oled.draw_image(&img, 0, category_pane.selected as u8)?;
                     } else {
                         category_pane.start_i += 1;
                         let img = category_pane
@@ -132,7 +134,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             .enumerate()
                             .fold(GrayImage::new(128, 64), |mut img, (i, page)| {
                                 if i == 7 {
-                                    overlay(&mut img, &invert(&mut page.clone()), 0, (i * 8) as u32);
+                                    let mut inverted = page.clone();
+                                    invert(&mut inverted);
+                                    overlay(&mut img, &inverted, 0, (i * 8) as u32);
                                 } else {
                                     overlay(&mut img, page, 0, (i * 8) as u32);
                                 }
@@ -160,7 +164,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             .enumerate()
                             .fold(GrayImage::new(128, 64), |mut img, (i, page)| {
                                 if i == 0 {
-                                    overlay(&mut img, &invert(&mut page.clone()), 0, (i * 8) as u32);
+                                    let mut inverted = page.clone();
+                                    invert(&mut inverted);
+                                    overlay(&mut img, &inverted, 0, (i * 8) as u32);
                                 } else {
                                     overlay(&mut img, page, 0, (i * 8) as u32);
                                 }
@@ -172,7 +178,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 [false, true, false] => {
                     let i = category_pane.start_i + category_pane.selected;
                     let url = category_pane.urls.get(i).unwrap();
-                    let s = reqwest::get(url).await?.text().await?;
+                    let s = reqwest::get(*url).await?.text().await?;
                     let rss = rss::RSS::new(&s)?;
 
                     let titles = rss
@@ -193,18 +199,20 @@ async fn main() -> Result<(), Box<dyn Error>> {
                         })
                         .collect::<Vec<_>>();
 
-                    let details = rss
+                    let descriptions = rss
                         .channel
                         .items
                         .into_iter()
-                        .map(|item| item.detail)
+                        .map(|item| item.description)
                         .collect::<Vec<_>>();
 
                     let mut img = titles.iter().take(8).enumerate().fold(
                         GrayImage::new(128, 64),
                         |mut img, (i, page)| {
                             if i == 0 {
-                                overlay(&mut img, &invert(&mut page.clone()), 0, (i * 8) as u32);
+                                let mut inverted = page.clone();
+                                invert(&mut inverted);
+                                overlay(&mut img, &inverted, 0, (i * 8) as u32);
                             } else {
                                 overlay(&mut img, page, 0, (i * 8) as u32);
                             }
@@ -214,7 +222,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                     state = State::Titles;
                     title_pane = TitlePane {
                         titles: titles,
-                        details: details,
+                        descriptions: descriptions,
                         start_i: 0,
                         selected: 0,
                     };
@@ -241,7 +249,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             .enumerate()
                             .fold(GrayImage::new(128, 64), |mut img, (i, page)| {
                                 if i == 7 {
-                                    overlay(&mut img, &invert(&mut page.clone()), 0, (i * 8) as u32);
+                                    let mut inverted = page.clone();
+                                    invert(&mut inverted);
+                                    overlay(&mut img, &inverted, 0, (i * 8) as u32);
                                 } else {
                                     overlay(&mut img, page, 0, (i * 8) as u32);
                                 }
@@ -269,7 +279,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             .enumerate()
                             .fold(GrayImage::new(128, 64), |mut img, (i, page)| {
                                 if i == 0 {
-                                    overlay(&mut img, &invert(&mut page.clone()), 0, (i * 8) as u32);
+                                    let mut inverted = page.clone();
+                                    invert(&mut inverted);
+                                    overlay(&mut img, &inverted, 0, (i * 8) as u32);
                                 } else {
                                     overlay(&mut img, page, 0, (i * 8) as u32);
                                 }
@@ -286,7 +298,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
                         .enumerate()
                         .fold(GrayImage::new(128, 64), |mut img, (i, page)| {
                             if i == category_pane.selected {
-                                overlay(&mut img, &invert(&mut page.clone()), 0, (i * 8) as u32);
+                                let mut inverted = page.clone();
+                                invert(&mut inverted);
+                                overlay(&mut img, &inverted, 0, (i * 8) as u32);
                             } else {
                                 overlay(&mut img, page, 0, (i * 8) as u32);
                             }
@@ -297,7 +311,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 }
                 [false, true, false] => {
                     let i = title_pane.start_i + title_pane.selected;
-                    let s = title_pane.details.get(i).unwrap();
+                    let s = title_pane.descriptions.get(i).unwrap();
 
                     let (mut v, s, _) = s.chars().fold(
                         (Vec::new(), String::new(), 0),
@@ -343,7 +357,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
                         .enumerate()
                         .fold(GrayImage::new(128, 64), |mut img, (i, page)| {
                             if i == title_pane.selected {
-                                overlay(&mut img, &invert(&mut page.clone()), 0, (i * 8) as u32);
+                                let mut inverted = page.clone();
+                                invert(&mut inverted);
+                                overlay(&mut img, &inverted, 0, (i * 8) as u32);
                             } else {
                                 overlay(&mut img, page, 0, i * 8);
                             }
