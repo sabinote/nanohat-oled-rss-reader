@@ -115,7 +115,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
             State::Categories => match pressed {
                 [true, false, false] => {
                     if category_pane.selected < 7 {
-                        let i = category_pane.start_i + category_pane.selected;
+                        let mut i = category_pane.start_i + category_pane.selected;
                         let img = category_pane.categories.get(i).unwrap();
                         oled.draw_image(img, 0, category_pane.selected as u8)?;
                         category_pane.selected += 1;
@@ -145,7 +145,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 }
                 [false, false, true] => {
                     if category_pane.selected > 0 {
-                        let i = category_pane.start_i + category_pane.selected;
+                        let mut i = category_pane.start_i + category_pane.selected;
                         let img = category_pane.categories.get(i).unwrap();
                         oled.draw_image(img, 0, category_pane.selected as u8)?;
                         category_pane.selected -= 1;
@@ -205,7 +205,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                         .map(|item| item.description)
                         .collect::<Vec<_>>();
 
-                    let mut img = titles.iter().take(8).enumerate().fold(
+                    let img = titles.iter().take(8).enumerate().fold(
                         GrayImage::new(128, 64),
                         |mut img, (i, page)| {
                             if i == 0 {
@@ -232,7 +232,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
             State::Titles => match pressed {
                 [true, false, false] => {
                     if title_pane.selected < 7 {
-                        let i = title_pane.start_i + title_pane.selected;
+                        let mut i = title_pane.start_i + title_pane.selected;
                         let img = title_pane.titles.get(i).unwrap();
                         oled.draw_image(img, 0, title_pane.selected as u8)?;
                         title_pane.selected += 1;
@@ -262,7 +262,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 }
                 [false, false, true] => {
                     if title_pane.selected > 0 {
-                        let i = title_pane.start_i + title_pane.selected;
+                        let mut i = title_pane.start_i + title_pane.selected;
                         let img = title_pane.titles.get(i).unwrap();
                         oled.draw_image(img, 0, title_pane.selected as u8)?;
                         title_pane.selected -= 1;
@@ -349,7 +349,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
             },
             State::Details => match pressed {
                 [true, false, true] => {
-                    let mut img = title_pane
+                    let img = title_pane
                         .titles
                         .iter()
                         .skip(title_pane.start_i)
