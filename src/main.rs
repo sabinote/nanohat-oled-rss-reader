@@ -4,7 +4,7 @@ mod rss;
 use i2cdev::linux::LinuxI2CDevice;
 use image::imageops::colorops::invert;
 use image::imageops::overlay;
-use image::{DynamicImage, GenericImage, GrayImage, Luma};
+use image::{DynamicImage, GenericImage, GenericImageView, GrayImage, Luma};
 use imageproc::drawing::draw_text_mut;
 use rusttype::{Font, Scale};
 use std::error::Error;
@@ -51,7 +51,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
         "科学",
         "地域",
     ]
-    .map(|title| {
+    .into_iter()
+    .map(|category| {
         let mut img = GrayImage::new(128, 8);
         draw_text_mut(
             &mut img,
@@ -60,7 +61,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
             0,
             Scale { x: 8.0, y: 8.0 },
             &font,
-            title,
+            category,
         );
         img
     })
@@ -76,7 +77,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         "https://news.yahoo.co.jp/rss/topics/science.xml",
         "https://news.yahoo.co.jp/rss/topics/local.xml",
     ];
-    assert_eq!(titles.len(), urls.len());
+    assert_eq!(categories.len(), urls.len());
 
     let img = categories
         .iter()
@@ -95,7 +96,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let mut category_pane = CategoryPane {
         categories: categories,
-        titles: titles,
+        urls: urls,
         start_i: 0,
         selected: 0,
     };
@@ -131,9 +132,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             .enumerate()
                             .fold(GrayImage::new(128, 64), |mut img, (i, page)| {
                                 if i == 7 {
-                                    overlay(&mut img, &invert(&mut page.clone()), 0, i * 8);
+                                    overlay(&mut img, &invert(&mut page.clone()), 0, (i * 8) as u32);
                                 } else {
-                                    overlay(&mut img, page, 0, i * 8);
+                                    overlay(&mut img, page, 0, (i * 8) as u32);
                                 }
                                 img
                             });
@@ -159,9 +160,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             .enumerate()
                             .fold(GrayImage::new(128, 64), |mut img, (i, page)| {
                                 if i == 0 {
-                                    overlay(&mut img, &invert(&mut page.clone()), 0, i * 8);
+                                    overlay(&mut img, &invert(&mut page.clone()), 0, (i * 8) as u32);
                                 } else {
-                                    overlay(&mut img, page, 0, i * 8);
+                                    overlay(&mut img, page, 0, (i * 8) as u32);
                                 }
                                 img
                             });
@@ -203,9 +204,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
                         GrayImage::new(128, 64),
                         |mut img, (i, page)| {
                             if i == 0 {
-                                overlay(&mut img, &invert(&mut page.clone()), 0, i * 8);
+                                overlay(&mut img, &invert(&mut page.clone()), 0, (i * 8) as u32);
                             } else {
-                                overlay(&mut img, page, 0, i * 8);
+                                overlay(&mut img, page, 0, (i * 8) as u32);
                             }
                         },
                     );
@@ -240,9 +241,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             .enumerate()
                             .fold(GrayImage::new(128, 64), |mut img, (i, page)| {
                                 if i == 7 {
-                                    overlay(&mut img, &invert(&mut page.clone()), 0, i * 8);
+                                    overlay(&mut img, &invert(&mut page.clone()), 0, (i * 8) as u32);
                                 } else {
-                                    overlay(&mut img, page, 0, i * 8);
+                                    overlay(&mut img, page, 0, (i * 8) as u32);
                                 }
                                 img
                             });
@@ -268,9 +269,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             .enumerate()
                             .fold(GrayImage::new(128, 64), |mut img, (i, page)| {
                                 if i == 0 {
-                                    overlay(&mut img, &invert(&mut page.clone()), 0, i * 8);
+                                    overlay(&mut img, &invert(&mut page.clone()), 0, (i * 8) as u32);
                                 } else {
-                                    overlay(&mut img, page, 0, i * 8);
+                                    overlay(&mut img, page, 0, (i * 8) as u32);
                                 }
                                 img
                             });
@@ -285,9 +286,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
                         .enumerate()
                         .fold(GrayImage::new(128, 64), |mut img, (i, page)| {
                             if i == category_pane.selected {
-                                overlay(&mut img, &invert(&mut page.clone()), 0, i * 8);
+                                overlay(&mut img, &invert(&mut page.clone()), 0, (i * 8) as u32);
                             } else {
-                                overlay(&mut img, page, 0, i * 8);
+                                overlay(&mut img, page, 0, (i * 8) as u32);
                             }
                             img
                         });
@@ -327,7 +328,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             &s,
                         );
                     }
-                    oled.draw_image(&DynamicImage::ImageLuma8(img), 0, 0)?;
+                    oled.draw_image(&img, 0, 0)?;
                     state = State::Details;
                 }
                 _ => (),
@@ -342,12 +343,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
                         .enumerate()
                         .fold(GrayImage::new(128, 64), |mut img, (i, page)| {
                             if i == title_pane.selected {
-                                overlay(&mut img, &invert(&mut page.clone()), 0, i * 8);
+                                overlay(&mut img, &invert(&mut page.clone()), 0, (i * 8) as u32);
                             } else {
                                 overlay(&mut img, page, 0, i * 8);
                             }
                         });
-                    oled.draw_image(&DynamicImage::ImageLuma8(img), 0, 0)?;
+                    oled.draw_image(&img, 0, 0)?;
                     state = State::Titles;
                 }
                 _ => (),

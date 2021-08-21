@@ -1,6 +1,6 @@
 use i2cdev::core::I2CDevice;
 use image::imageops::{dither, BiLevel};
-use image::{DynamicImage, GenericImageView};
+use image::{DynamicImage, GenericImageView, GrayImage};
 use std::error::Error;
 use std::io;
 
