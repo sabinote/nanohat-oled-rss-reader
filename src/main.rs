@@ -79,12 +79,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
     ];
     assert_eq!(categories.len(), urls.len());
 
-    let img = categories
-        .iter()
-        .take(8)
-        .map(|(img, _)| img)
-        .enumerate()
-        .fold(GrayImage::new(128, 64), |mut img, (i, page)| {
+    let img = categories.iter().take(8).enumerate().fold(
+        GrayImage::new(128, 64),
+        |mut img, (i, page)| {
             if i == 0 {
                 let mut inverted = page.clone();
                 invert(&mut inverted);
@@ -93,7 +90,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 overlay(&mut img, page, 0, (i * 8) as u32);
             }
             img
-        });
+        },
+    );
     oled.draw_image(&img, 0, 0)?;
 
     let mut category_pane = CategoryPane {
@@ -152,9 +150,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
                         oled.draw_image(img, 0, category_pane.selected as u8)?;
                         category_pane.selected -= 1;
                         i -= 1;
-                        let img = category_pane.categories.get(i).unwrap();
-                        let inverted = invert(&mut img.clone());
-                        oled.draw_image(&inverted, 0, category_pane.selected as u8)?;
+                        let mut img = category_pane.categories.get(i).unwrap().clone();
+                        invert(&mut img);
+                        oled.draw_image(&img, 0, category_pane.selected as u8)?;
                     } else {
                         category_pane.start_i -= 1;
                         let img = category_pane
@@ -196,6 +194,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                                 &font,
                                 &item.title,
                             );
+                            img
                         })
                         .collect::<Vec<_>>();
 
@@ -216,9 +215,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             } else {
                                 overlay(&mut img, page, 0, (i * 8) as u32);
                             }
+                            img
                         },
                     );
-                    oled.draw_image(&DynamicImage::ImageLuma8(img), 0, 0)?;
+                    oled.draw_image(&img, 0, 0)?;
                     state = State::Titles;
                     title_pane = TitlePane {
                         titles: titles,
@@ -237,9 +237,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
                         oled.draw_image(img, 0, title_pane.selected as u8)?;
                         title_pane.selected += 1;
                         i += 1;
-                        let img = title_pane.titles.get(i).unwrap();
-                        let inverted = invert(&mut img.clone());
-                        oled.draw_image(&inverted, 0, title_pane.selected as u8)?;
+                        let mut img = title_pane.titles.get(i).unwrap().clone();
+                        invert(&mut img);
+                        oled.draw_image(&img, 0, title_pane.selected as u8)?;
                     } else {
                         title_pane.start_i += 1;
                         let img = title_pane
@@ -267,9 +267,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
                         oled.draw_image(img, 0, title_pane.selected as u8)?;
                         title_pane.selected -= 1;
                         i -= 1;
-                        let img = title_pane.titles.get(i).unwrap();
-                        let inverted = invert(&mut img.clone());
-                        oled.draw_image(&inverted, 0, title_pane.selected as u8)?;
+                        let mut img = title_pane.titles.get(i).unwrap().clone();
+                        invert(&mut img);
+                        oled.draw_image(&img, 0, title_pane.selected as u8)?;
                     } else {
                         title_pane.start_i -= 1;
                         let img = title_pane
@@ -361,8 +361,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
                                 invert(&mut inverted);
                                 overlay(&mut img, &inverted, 0, (i * 8) as u32);
                             } else {
-                                overlay(&mut img, page, 0, i * 8);
+                                overlay(&mut img, page, 0, (i * 8) as u32);
                             }
+                            img
                         });
                     oled.draw_image(&img, 0, 0)?;
                     state = State::Titles;
