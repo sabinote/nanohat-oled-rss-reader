@@ -61,12 +61,7 @@ where
         Ok(())
     }
 
-    pub fn draw_image(
-        &mut self,
-        img: &DynamicImage,
-        x: u8,
-        page_y: u8,
-    ) -> Result<(), Box<dyn Error>> {
+    pub fn draw_image(&mut self, img: &GrayImage, x: u8, page_y: u8) -> Result<(), Box<dyn Error>> {
         let w = img.width();
         let (h, rem) = {
             let h = img.height();
@@ -95,8 +90,8 @@ where
             /*do nothing*/
         }
 
-        let mut gray_img = img.grayscale().into_luma8();
-        dither(&mut gray_img, &BiLevel);
+        let mut img = img.clone();
+        dither(&mut img, &BiLevel);
 
         let height_pixel_offsets = [0, 8, 16, 24, 32, 40, 48, 56];
         let data = height_pixel_offsets
@@ -106,7 +101,7 @@ where
                 (0..w)
                     .map(|x| {
                         (0..8).rev().fold(0u8, |mut bits, y| {
-                            let px = gray_img.get_pixel(x as u32, offset + y);
+                            let px = img.get_pixel(x as u32, offset + y);
                             bits <<= 1;
                             bits |= if px[0] == 255 { 1 } else { 0 };
                             bits
@@ -166,7 +161,7 @@ mod tests {
     fn draw_image_test1() {
         let i2cdev = LinuxI2CDevice::new("/dev/i2c-0", 0x3c).unwrap();
         let mut oled = NanoHatOLED::open(i2cdev).unwrap();
-        let img_128x64 = DynamicImage::new_luma8(128, 64);
+        let img_128x64 = GrayImage::new(128, 64);
         assert!(oled.draw_image(&img_128x64, 0, 0).is_ok());
         assert!(oled.draw_image(&img_128x64, 1, 0).is_err());
         assert!(oled.draw_image(&img_128x64, 0, 1).is_err());
@@ -177,7 +172,7 @@ mod tests {
     fn draw_image_test2() {
         let i2cdev = LinuxI2CDevice::new("/dev/i2c-0", 0x3c).unwrap();
         let mut oled = NanoHatOLED::open(i2cdev).unwrap();
-        let img_8x8 = DynamicImage::new_luma8(8, 8);
+        let img_8x8 = GrayImage::new(8, 8);
         assert!(oled.draw_image(&img_8x8, 120, 0).is_ok());
         assert!(oled.draw_image(&img_8x8, 120, 7).is_ok());
         assert!(oled.draw_image(&img_8x8, 0, 0).is_ok());
@@ -187,14 +182,14 @@ mod tests {
     fn draw_image_test3() {
         let i2cdev = LinuxI2CDevice::new("/dev/i2c-0", 0x3c).unwrap();
         let mut oled = NanoHatOLED::open(i2cdev).unwrap();
-        let img_8x9 = DynamicImage::new_luma8(8, 9);
+        let img_8x9 = GrayImage::new(8, 9);
         assert!(oled.draw_image(&img_8x9, 0, 0).is_err());
     }
     #[test]
     fn draw_image_test4() {
         let i2cdev = LinuxI2CDevice::new("/dev/i2c-0", 0x3c).unwrap();
         let mut oled = NanoHatOLED::open(i2cdev).unwrap();
-        let img_10x8 = DynamicImage::new_luma8(10, 8);
+        let img_10x8 = GrayImage::new(10, 8);
         assert!(oled.draw_image(&img_10x8, 0, 0).is_ok());
     }
     #[test]
