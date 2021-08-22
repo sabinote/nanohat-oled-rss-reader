@@ -123,7 +123,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                         let mut img = category_pane.categories.get(i).unwrap().clone();
                         invert(&mut img);
                         oled.draw_image(&img, 0, category_pane.selected as u8)?;
-                    } else {
+                    } else if category_pane.categories.len() > category_pane.start_i + 8{
                         category_pane.start_i += 1;
                         let img = category_pane
                             .categories
@@ -153,7 +153,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                         let mut img = category_pane.categories.get(i).unwrap().clone();
                         invert(&mut img);
                         oled.draw_image(&img, 0, category_pane.selected as u8)?;
-                    } else {
+                    } else if category_pane.start_i > 0 {
                         category_pane.start_i -= 1;
                         let img = category_pane
                             .categories
