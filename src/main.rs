@@ -326,7 +326,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 [false, true, false] => {
                     let i = title_pane.start_i + title_pane.selected;
                     let s = match title_pane.descriptions.get(i).unwrap() {
-                        Some(ref s) => s,
+                        Some(s) => &s,
                         None => "Not found",
                     };
 
