@@ -216,7 +216,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
                         .channel
                         .items
                         .into_iter()
-                        .map(|item| item.description)
+                        .map(|item| {
+                            match item.description {
+                                Some(s) => s,
+                                None => "Not Found".to_string(),
+                            }
+                        })
                         .collect::<Vec<_>>();
 
                     let img = titles.iter().take(8).enumerate().fold(
@@ -325,10 +330,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 }
                 [false, true, false] => {
                     let i = title_pane.start_i + title_pane.selected;
-                    let s = match title_pane.descriptions.get(i).unwrap() {
-                        Some(s) => &s,
-                        None => "Not found",
-                    };
+                    let s = match title_pane.descriptions.get(i).unwrap();
 
                     let (mut v, s, _) = s.chars().fold(
                         (Vec::new(), String::new(), 0),
