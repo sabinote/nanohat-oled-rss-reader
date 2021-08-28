@@ -111,7 +111,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         selected: 0,
     };
 
-    let mut state = State::Categories;
+    let mut state = State::Category;
 
     while let Ok(pressed) = button.pressed().await {
         match state {
