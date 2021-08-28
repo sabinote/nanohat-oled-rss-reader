@@ -32,7 +32,7 @@ pub struct Item {
     pub link: String,
     #[serde(rename = "pubDate")]
     pub pub_date: String,
-    pub description: String,
+    pub description: Option<String>,
     pub comments: Option<String>,
 }
 
@@ -75,7 +75,7 @@ mod tests {
         assert_eq!(item.title, "アイテムのタイトルです");
         assert_eq!(item.link, "アイテムへのリンクです");
         assert_eq!(item.pub_date, "2021-08-12T11:37:05.000Z");
-        assert_eq!(item.description, "アイテムの説明です");
+        assert_eq!(item.description.unwrap(), "アイテムの説明です");
         assert_eq!(item.comments.unwrap(), "アイテムへのコメントです");
     }
 }
