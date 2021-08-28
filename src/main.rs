@@ -10,24 +10,26 @@ use rusttype::{Font, Scale};
 use std::error::Error;
 use std::ops::Range;
 
+/*カテゴリ表示画面に必要な情報を保持する構造体*/
 struct CategoryPane {
-    categories: Vec<GrayImage>,
-    urls: Vec<&'static str>,
-    start_i: usize,
-    selected: usize,
+    categories: Vec<GrayImage>, //カテゴリの文字を画像化したもののリスト
+    urls: Vec<&'static str>,    //データ取得先のurlリスト
+    start_i: usize,             //表示領域の最初のインデックス
+    selected: usize,            //画面上で選択されているインデックス(0 <= x < 8 )
 }
 
+/*タイトル表示画面に必要な情報を保持する構造体*/
 struct TitlePane {
-    titles: Vec<GrayImage>,
-    descriptions: Vec<String>,
-    start_i: usize,
-    selected: usize,
+    titles: Vec<GrayImage>,    //カテゴリの文字を画像化したもののリスト
+    descriptions: Vec<String>, //タイトルの説明を保持するリスト
+    start_i: usize,            //表示領域の最初のインデックス
+    selected: usize,           //画面上で選択されているインデックス(0 <= x < 8 )
 }
-
+/*状態を表す列挙型*/
 enum State {
-    Categories,
-    Titles,
-    Details,
+    Category,
+    Title,
+    Overview,
 }
 
 #[tokio::main]
@@ -51,7 +53,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         "科学",
         "地域",
     ]
-    .into_iter()
+    .iter()
     .map(|category| {
         let mut img = GrayImage::new(128, 8);
         draw_text_mut(
@@ -62,7 +64,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
             Scale { x: 8.0, y: 8.0 },
             &font,
             category,
-        );
+        ); //画像にカテゴリの文字を描画
         img
     })
     .collect::<Vec<_>>();
@@ -79,6 +81,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     ];
     assert_eq!(categories.len(), urls.len());
 
+    /*最初に表示する画面を生成*/
     let img = categories.iter().take(8).enumerate().fold(
         GrayImage::new(128, 64),
         |mut img, (i, page)| {
@@ -112,18 +115,22 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     while let Ok(pressed) = button.pressed().await {
         match state {
-            State::Categories => match pressed {
+            State::Category => match pressed {
                 [true, false, false] => {
+                    //下に移動
                     if category_pane.selected < 7 {
-                        let mut i = category_pane.start_i + category_pane.selected;
-                        let img = category_pane.categories.get(i).unwrap();
-                        oled.draw_image(img, 0, category_pane.selected as u8)?;
+                        //反転している箇所を下に移動するだけで良い場合
+                        let mut i = category_pane.start_i + category_pane.selected; //現在選択中のカテゴリのインデックス算出
+                        let img = category_pane.categories.get(i).unwrap(); //選択中の画像取得
+                        oled.draw_image(img, 0, category_pane.selected as u8)?; //反転していた表示をもとの表示に戻す
                         category_pane.selected += 1;
                         i += 1;
-                        let mut img = category_pane.categories.get(i).unwrap().clone();
-                        invert(&mut img);
+                        let mut img = category_pane.categories.get(i).unwrap().clone(); //移動先の画像取得
+                        invert(&mut img); //画像を反転
                         oled.draw_image(&img, 0, category_pane.selected as u8)?;
-                    } else if category_pane.categories.len() > category_pane.start_i + 8{
+                    //反転した画像を表示
+                    } else if category_pane.categories.len() > category_pane.start_i + 8 {
+                        //一番下を選択している状態で下に移動する場合
                         category_pane.start_i += 1;
                         let img = category_pane
                             .categories
@@ -132,6 +139,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             .enumerate()
                             .fold(GrayImage::new(128, 64), |mut img, (i, page)| {
                                 if i == 7 {
+                                    //一番下は選択したままなので反転する
                                     let mut inverted = page.clone();
                                     invert(&mut inverted);
                                     overlay(&mut img, &inverted, 0, (i * 8) as u32);
@@ -144,16 +152,20 @@ async fn main() -> Result<(), Box<dyn Error>> {
                     }
                 }
                 [false, false, true] => {
+                    //上に移動
                     if category_pane.selected > 0 {
-                        let mut i = category_pane.start_i + category_pane.selected;
-                        let img = category_pane.categories.get(i).unwrap();
-                        oled.draw_image(img, 0, category_pane.selected as u8)?;
+                        //反転している箇所を上に移動するだけで良い場合
+                        let mut i = category_pane.start_i + category_pane.selected; //現在選択中のカテゴリのインデックス算出
+                        let img = category_pane.categories.get(i).unwrap(); //選択中の画像取得
+                        oled.draw_image(img, 0, category_pane.selected as u8)?; //反転していた表示をもとの表示に戻す
                         category_pane.selected -= 1;
                         i -= 1;
-                        let mut img = category_pane.categories.get(i).unwrap().clone();
-                        invert(&mut img);
+                        let mut img = category_pane.categories.get(i).unwrap().clone(); //移動先の画像取得
+                        invert(&mut img); //画像を反転
                         oled.draw_image(&img, 0, category_pane.selected as u8)?;
+                    //反転した画像を表示
                     } else if category_pane.start_i > 0 {
+                        //一番上を選択している状態で上に移動する場合
                         category_pane.start_i -= 1;
                         let img = category_pane
                             .categories
@@ -162,6 +174,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             .enumerate()
                             .fold(GrayImage::new(128, 64), |mut img, (i, page)| {
                                 if i == 0 {
+                                    //一番上は選択したままなので反転する
                                     let mut inverted = page.clone();
                                     invert(&mut inverted);
                                     overlay(&mut img, &inverted, 0, (i * 8) as u32);
@@ -174,6 +187,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                     }
                 }
                 [false, true, false] => {
+                    //選択したカテゴリのタイトル一覧画面へ遷移
                     let i = category_pane.start_i + category_pane.selected;
                     let url = category_pane.urls.get(i).unwrap();
                     let s = reqwest::get(*url).await?.text().await?;
@@ -219,7 +233,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                         },
                     );
                     oled.draw_image(&img, 0, 0)?;
-                    state = State::Titles;
+                    state = State::Title;
                     title_pane = TitlePane {
                         titles: titles,
                         descriptions: descriptions,
@@ -229,7 +243,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 }
                 _ => (),
             },
-            State::Titles => match pressed {
+            State::Title => match pressed {
                 [true, false, false] => {
                     if title_pane.selected < 7 {
                         let mut i = title_pane.start_i + title_pane.selected;
@@ -307,7 +321,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             img
                         });
                     oled.draw_image(&img, 0, 0)?;
-                    state = State::Categories;
+                    state = State::Category;
                 }
                 [false, true, false] => {
                     let i = title_pane.start_i + title_pane.selected;
@@ -343,11 +357,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
                         );
                     }
                     oled.draw_image(&img, 0, 0)?;
-                    state = State::Details;
+                    state = State::Overview;
                 }
                 _ => (),
             },
-            State::Details => match pressed {
+            State::Overview => match pressed {
                 [true, false, true] => {
                     let img = title_pane
                         .titles
@@ -366,11 +380,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             img
                         });
                     oled.draw_image(&img, 0, 0)?;
-                    state = State::Titles;
+                    state = State::Title;
                 }
                 _ => (),
             },
-            _ => unimplemented!(),
         }
     }
     Ok(())

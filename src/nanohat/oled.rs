@@ -77,7 +77,7 @@ where
         } else if rem != 0 {
             return Err(io::Error::new(
                 io::ErrorKind::InvalidInput,
-                "The Image's height are invalid ",
+                "The Image's height is invalid",
             )
             .into());
         } else if page_y as u32 + h > 8 {
